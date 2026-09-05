@@ -44,7 +44,20 @@ function drawScene() {
   drawSprite( ctx, 'ball', ball.x, ball.y, ball.w, ball.h );
 }
 
+function update() {
+  if ( gameState !== 'playing' ) return;
+
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+}
+
+function loop() {
+  update();
+  drawScene();
+  requestAnimationFrame( loop );
+}
+
 loadSpritesheet( () => {
   resetLevel( currentLevel );
-  drawScene();
+  loop();
 } );
