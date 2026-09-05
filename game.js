@@ -71,6 +71,8 @@ function drawScene() {
 
   if ( gameState === 'start' ) {
     drawOverlay( 'Arkanoid', 'Presiona una tecla o haz click para comenzar' );
+  } else if ( gameState === 'gameover' ) {
+    drawOverlay( 'Game Over', 'Puntaje final: ' + score + ' — recarga la página para reintentar' );
   }
 }
 
@@ -170,6 +172,16 @@ function updateExplosions() {
   } );
 }
 
+function loseLife() {
+  lives -= 1;
+  if ( lives > 0 ) {
+    resetLevel( currentLevel );
+    gameState = 'start';
+  } else {
+    gameState = 'gameover';
+  }
+}
+
 function update() {
   if ( gameState === 'start' || gameState === 'playing' ) {
     updatePaddleFromKeys();
@@ -180,6 +192,10 @@ function update() {
   if ( gameState !== 'playing' ) return;
 
   updateBallPhysics();
+
+  if ( isBallOutOfBounds() ) {
+    loseLife();
+  }
 }
 
 function loop() {
