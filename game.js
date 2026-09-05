@@ -71,6 +71,8 @@ function drawScene() {
 
   if ( gameState === 'start' ) {
     drawOverlay( 'Arkanoid', 'Presiona una tecla o haz click para comenzar' );
+  } else if ( gameState === 'paused' ) {
+    drawOverlay( 'Pausa', 'Presiona Esc o P para continuar' );
   } else if ( gameState === 'gameover' ) {
     drawOverlay( 'Game Over', 'Puntaje final: ' + score + ' — recarga la página para reintentar' );
   }
@@ -201,9 +203,9 @@ function update() {
     updatePaddleFromKeys();
   }
 
-  updateExplosions();
-
   if ( gameState !== 'playing' ) return;
+
+  updateExplosions();
 
   updateBallPhysics();
 
@@ -232,9 +234,21 @@ function startGame() {
   gameState = 'playing';
 }
 
+function togglePause() {
+  if ( gameState === 'playing' ) {
+    gameState = 'paused';
+  } else if ( gameState === 'paused' ) {
+    gameState = 'playing';
+  }
+}
+
 document.addEventListener( 'keydown', ( e ) => {
   keys[ e.key ] = true;
   startGame();
+
+  if ( e.key === 'Escape' || e.key === 'p' || e.key === 'P' ) {
+    togglePause();
+  }
 } );
 document.addEventListener( 'keyup', ( e ) => {
   keys[ e.key ] = false;
