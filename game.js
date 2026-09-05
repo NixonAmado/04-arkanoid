@@ -182,6 +182,20 @@ function loseLife() {
   }
 }
 
+function isLevelCleared() {
+  return blocks.every( ( block ) => !block.alive );
+}
+
+function advanceLevel() {
+  if ( currentLevel < LEVELS.length - 1 ) {
+    currentLevel += 1;
+    resetLevel( currentLevel );
+    gameState = 'start';
+  } else {
+    gameState = 'win';
+  }
+}
+
 function update() {
   if ( gameState === 'start' || gameState === 'playing' ) {
     updatePaddleFromKeys();
@@ -195,6 +209,11 @@ function update() {
 
   if ( isBallOutOfBounds() ) {
     loseLife();
+    return;
+  }
+
+  if ( isLevelCleared() ) {
+    advanceLevel();
   }
 }
 
