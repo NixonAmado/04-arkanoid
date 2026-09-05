@@ -32,6 +32,20 @@ function resetLevel( levelIndex ) {
   ball.vy = 0;
 }
 
+function drawOverlay( title, subtitle ) {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect( 0, 0, canvas.width, canvas.height );
+
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+
+  ctx.font = 'bold 36px sans-serif';
+  ctx.fillText( title, canvas.width / 2, canvas.height / 2 - 10 );
+
+  ctx.font = '18px sans-serif';
+  ctx.fillText( subtitle, canvas.width / 2, canvas.height / 2 + 30 );
+}
+
 function drawScene() {
   ctx.clearRect( 0, 0, canvas.width, canvas.height );
 
@@ -42,6 +56,10 @@ function drawScene() {
 
   drawSprite( ctx, 'paddle', paddle.x, paddle.y, paddle.w, paddle.h );
   drawSprite( ctx, 'ball', ball.x, ball.y, ball.w, ball.h );
+
+  if ( gameState === 'start' ) {
+    drawOverlay( 'Arkanoid', 'Presiona una tecla o haz click para comenzar' );
+  }
 }
 
 function update() {
@@ -56,6 +74,18 @@ function loop() {
   drawScene();
   requestAnimationFrame( loop );
 }
+
+function startGame() {
+  if ( gameState !== 'start' ) return;
+
+  const multiplier = LEVELS[ currentLevel ].ballSpeedMultiplier;
+  ball.vx = BASE_BALL_SPEED * multiplier;
+  ball.vy = -BASE_BALL_SPEED * multiplier;
+  gameState = 'playing';
+}
+
+document.addEventListener( 'keydown', startGame );
+canvas.addEventListener( 'click', startGame );
 
 loadSpritesheet( () => {
   resetLevel( currentLevel );
