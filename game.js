@@ -6,6 +6,7 @@ const PADDLE_H = 14;
 const BALL_SIZE = 16;
 const BASE_BALL_SPEED = 5;
 const PADDLE_SPEED = 8;
+const MAX_BOUNCE_ANGLE = Math.PI / 3; // 60°
 const POINTS_PER_BLOCK = 10;
 const STARTING_LIVES = 3;
 
@@ -63,6 +64,11 @@ function drawScene() {
   drawSprite( ctx, 'paddle', paddle.x, paddle.y, paddle.w, paddle.h );
   drawSprite( ctx, 'ball', ball.x, ball.y, ball.w, ball.h );
 
+  for ( const explosion of explosions ) {
+    const frame = EXPLOSION_FRAMES[ explosion.color ][ explosion.frame ];
+    drawFrame( ctx, frame, explosion.x, explosion.y, 32, 16 );
+  }
+
   if ( gameState === 'start' ) {
     drawOverlay( 'Arkanoid', 'Presiona una tecla o haz click para comenzar' );
   }
@@ -78,15 +84,102 @@ function updatePaddleFromKeys() {
   paddle.x = clamp( paddle.x, 0, canvas.width - paddle.w );
 }
 
+function rectsIntersect( a, b ) {
+  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+function bounceOffPaddle() {
+  const speed = Math.hypot( ball.vx, ball.vy );
+  const ballCenterX = ball.x + ball.w / 2;
+  const paddleCenterX = paddle.x + paddle.w / 2;
+  const relIntersect = clamp( ( ballCenterX - paddleCenterX ) / ( paddle.w / 2 ), -1, 1 );
+  const angle = relIntersect * MAX_BOUNCE_ANGLE;
+
+  ball.vx = speed * Math.sin( angle );
+  ball.vy = -speed * Math.cos( angle );
+  ball.y = paddle.y - ball.h;
+}
+
+function updateBallPhysics() {
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  if ( ball.x <= 0 ) {
+    ball.x = 0;
+    ball.vx = -ball.vx;
+  } else if ( ball.x + ball.w >= canvas.width ) {
+    ball.x = canvas.width - ball.w;
+    ball.vx = -ball.vx;
+  }
+
+  if ( ball.y <= 0 ) {
+    ball.y = 0;
+    ball.vy = -ball.vy;
+  }
+
+  if ( ball.vy > 0 && rectsIntersect( ball, paddle ) ) {
+    bounceOffPaddle();
+  }
+
+  checkBlockCollisions();
+}
+
+function isBallOutOfBounds() {
+  return ball.y > canvas.height;
+}
+
+function spawnExplosion( block ) {
+  explosions.push( {
+    x: block.x + block.w / 2 - 16,
+    y: block.y + block.h / 2 - 8,
+    color: block.color,
+    frame: 0,
+    startTime: performance.now(),
+  } );
+}
+
+function checkBlockCollisions() {
+  for ( const block of blocks ) {
+    if ( !block.alive || !rectsIntersect( ball, block ) ) continue;
+
+    block.alive = false;
+    score += POINTS_PER_BLOCK;
+    spawnExplosion( block );
+
+    const overlapX = Math.min( ball.x + ball.w - block.x, block.x + block.w - ball.x );
+    const overlapY = Math.min( ball.y + ball.h - block.y, block.y + block.h - ball.y );
+
+    if ( overlapX < overlapY ) {
+      ball.vx = -ball.vx;
+    } else {
+      ball.vy = -ball.vy;
+    }
+
+    break;
+  }
+}
+
+function updateExplosions() {
+  const now = performance.now();
+  const frameDuration = EXPLOSION_DURATION / 4;
+
+  explosions = explosions.filter( ( explosion ) => {
+    const elapsed = now - explosion.startTime;
+    explosion.frame = Math.floor( elapsed / frameDuration );
+    return explosion.frame < 4;
+  } );
+}
+
 function update() {
   if ( gameState === 'start' || gameState === 'playing' ) {
     updatePaddleFromKeys();
   }
 
+  updateExplosions();
+
   if ( gameState !== 'playing' ) return;
 
-  ball.x += ball.vx;
-  ball.y += ball.vy;
+  updateBallPhysics();
 }
 
 function loop() {
