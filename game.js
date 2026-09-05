@@ -53,6 +53,17 @@ function drawOverlay( title, subtitle ) {
   ctx.fillText( subtitle, canvas.width / 2, canvas.height / 2 + 30 );
 }
 
+function drawHUD() {
+  ctx.fillStyle = '#fff';
+  ctx.font = '18px sans-serif';
+
+  ctx.textAlign = 'left';
+  ctx.fillText( 'Score: ' + score, 16, 24 );
+
+  ctx.textAlign = 'right';
+  ctx.fillText( 'Vidas: ' + lives, canvas.width - 16, 24 );
+}
+
 function drawScene() {
   ctx.clearRect( 0, 0, canvas.width, canvas.height );
 
@@ -67,6 +78,10 @@ function drawScene() {
   for ( const explosion of explosions ) {
     const frame = EXPLOSION_FRAMES[ explosion.color ][ explosion.frame ];
     drawFrame( ctx, frame, explosion.x, explosion.y, 32, 16 );
+  }
+
+  if ( gameState === 'playing' || gameState === 'paused' ) {
+    drawHUD();
   }
 
   if ( gameState === 'start' ) {
