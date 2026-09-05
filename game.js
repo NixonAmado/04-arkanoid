@@ -75,6 +75,8 @@ function drawScene() {
     drawOverlay( 'Pausa', 'Presiona Esc o P para continuar' );
   } else if ( gameState === 'gameover' ) {
     drawOverlay( 'Game Over', 'Puntaje final: ' + score + ' — recarga la página para reintentar' );
+  } else if ( gameState === 'win' ) {
+    drawOverlay( '¡Ganaste!', 'Puntaje: ' + score + ' — presiona una tecla o haz click para reiniciar' );
   }
 }
 
@@ -242,9 +244,20 @@ function togglePause() {
   }
 }
 
+function restartGame() {
+  if ( gameState !== 'win' ) return;
+
+  score = 0;
+  lives = STARTING_LIVES;
+  currentLevel = 0;
+  resetLevel( currentLevel );
+  gameState = 'start';
+}
+
 document.addEventListener( 'keydown', ( e ) => {
   keys[ e.key ] = true;
   startGame();
+  restartGame();
 
   if ( e.key === 'Escape' || e.key === 'p' || e.key === 'P' ) {
     togglePause();
@@ -253,7 +266,10 @@ document.addEventListener( 'keydown', ( e ) => {
 document.addEventListener( 'keyup', ( e ) => {
   keys[ e.key ] = false;
 } );
-canvas.addEventListener( 'click', startGame );
+canvas.addEventListener( 'click', () => {
+  startGame();
+  restartGame();
+} );
 
 canvas.addEventListener( 'mousemove', ( e ) => {
   if ( gameState !== 'start' && gameState !== 'playing' ) return;
