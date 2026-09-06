@@ -71,19 +71,19 @@ Convenciones:
 
 ## Acceptance criteria
 
-- [ ] El juego carga sin errores en consola al abrir `index.html`.
-- [ ] La pantalla de inicio se muestra antes del nivel 1 y espera tecla/click para arrancar.
-- [ ] La paleta se mueve con teclado (flechas o A/D) y con mouse.
-- [ ] La pelota rebota en paredes, techo y paleta; cae si la paleta no la intercepta.
-- [ ] Romper un bloque suma exactamente 10 puntos y dispara la animación de explosión correspondiente a su color.
-- [ ] Al perder una vida, el nivel actual se reinicia completo (bloques, paddle, pelota).
-- [ ] Al llegar a 0 vidas, se muestra el overlay de game over y el juego no reinicia automáticamente.
-- [ ] Al destruir todos los bloques de un nivel (1-4), el juego avanza automáticamente al siguiente nivel con su propio layout.
-- [ ] Al destruir todos los bloques del nivel 5, se muestra el overlay de victoria con opción de reiniciar.
-- [ ] Usar la opción de reinicio en el overlay de victoria vuelve el juego al nivel 1 con score 0 y 3 vidas.
-- [ ] Presionar la tecla de pausa detiene el loop y muestra overlay de pausa; presionarla de nuevo reanuda desde el mismo estado.
-- [ ] El HUD muestra el score y las vidas actualizados en todo momento durante `'playing'`/`'paused'`.
-- [ ] Todos los sprites (paddle, ball, bloques por color) se dibujan usando `assets/spritesheet.js`, sin placeholders de color plano.
+- [x] El juego carga sin errores en consola al abrir `index.html`.
+- [x] La pantalla de inicio se muestra antes del nivel 1 y espera tecla/click para arrancar.
+- [x] La paleta se mueve con teclado (flechas o A/D) y con mouse.
+- [x] La pelota rebota en paredes, techo y paleta; cae si la paleta no la intercepta.
+- [x] Romper un bloque suma exactamente 10 puntos y dispara la animación de explosión correspondiente a su color.
+- [x] Al perder una vida, el nivel actual se reinicia completo (bloques, paddle, pelota).
+- [x] Al llegar a 0 vidas, se muestra el overlay de game over y el juego no reinicia automáticamente.
+- [x] Al destruir todos los bloques de un nivel (1-4), el juego avanza automáticamente al siguiente nivel con su propio layout.
+- [x] Al destruir todos los bloques del nivel 5, se muestra el overlay de victoria con opción de reiniciar.
+- [x] Usar la opción de reinicio en el overlay de victoria vuelve el juego al nivel 1 con score 0 y 3 vidas.
+- [x] Presionar la tecla de pausa detiene el loop y muestra overlay de pausa; presionarla de nuevo reanuda desde el mismo estado.
+- [x] El HUD muestra el score y las vidas actualizados en todo momento durante `'playing'`/`'paused'`.
+- [x] Todos los sprites (paddle, ball, bloques por color) se dibujan usando `assets/spritesheet.js`, sin placeholders de color plano.
 
 ## Decisions
 

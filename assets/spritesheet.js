@@ -8,7 +8,15 @@ const EXPLOSION_FRAMES = {
   gray: [ { sx: 256, sy: 176, sw: 32, sh: 16 }, { sx: 288, sy: 176, sw: 32, sh: 16 }, { sx: 320, sy: 176, sw: 32, sh: 16 }, { sx: 352, sy: 176, sw: 32, sh: 16 } ],
 };
 
-const EXPLOSION_DURATION = 150;
+const EXPLOSION_DURATIONS = {
+  gray: 150,
+  red: 150,
+  yellow: 200,
+  cyan: 200,
+  green: 200,
+  magenta: 250,
+  hotpink: 250,
+};
 
 const SPRITES = {
   paddle: { sx: 32, sy: 112, sw: 162, sh: 14 },

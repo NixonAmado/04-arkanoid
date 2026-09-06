@@ -9,6 +9,9 @@ const PADDLE_SPEED = 8;
 const MAX_BOUNCE_ANGLE = Math.PI / 3; // 60°
 const POINTS_PER_BLOCK = 10;
 const STARTING_LIVES = 3;
+const PARTICLE_GRAVITY = 0.25;
+const PARTICLE_SIZE = 8;
+const PARTICLE_LIFE = 500;
 
 let gameState = 'start';
 let score = 0;
@@ -19,6 +22,8 @@ let paddle = { x: 0, y: 0, w: PADDLE_W, h: PADDLE_H };
 let ball = { x: 0, y: 0, w: BALL_SIZE, h: BALL_SIZE, vx: 0, vy: 0 };
 let blocks = [];
 let explosions = [];
+let particles = [];
+let screenShake = { startTime: null, duration: 0, magnitude: 0 };
 const keys = {};
 
 function clamp( value, min, max ) {
@@ -29,6 +34,8 @@ function resetLevel( levelIndex ) {
   const level = LEVELS[ levelIndex ];
   blocks = level.blocks.map( b => ( { ...b } ) );
   explosions = [];
+  particles = [];
+  screenShake = { startTime: null, duration: 0, magnitude: 0 };
 
   paddle.x = ( canvas.width - PADDLE_W ) / 2;
   paddle.y = canvas.height - PADDLE_H - 20;
@@ -64,8 +71,26 @@ function drawHUD() {
   ctx.fillText( 'Vidas: ' + lives, canvas.width - 16, 24 );
 }
 
+function drawParticles() {
+  const now = performance.now();
+
+  for ( const particle of particles ) {
+    const elapsed = now - particle.startTime;
+    const alpha = clamp( 1 - elapsed / particle.life, 0, 1 );
+
+    ctx.globalAlpha = alpha;
+    drawFrame( ctx, { sx: particle.sx, sy: particle.sy, sw: particle.sw, sh: particle.sh }, particle.x, particle.y, particle.sw, particle.sh );
+  }
+
+  ctx.globalAlpha = 1;
+}
+
 function drawScene() {
   ctx.clearRect( 0, 0, canvas.width, canvas.height );
+
+  const shakeOffset = getScreenShakeOffset();
+  ctx.save();
+  ctx.translate( shakeOffset.x, shakeOffset.y );
 
   for ( const block of blocks ) {
     if ( !block.alive ) continue;
@@ -79,6 +104,10 @@ function drawScene() {
     const frame = EXPLOSION_FRAMES[ explosion.color ][ explosion.frame ];
     drawFrame( ctx, frame, explosion.x, explosion.y, 32, 16 );
   }
+
+  drawParticles();
+
+  ctx.restore();
 
   if ( gameState === 'playing' || gameState === 'paused' ) {
     drawHUD();
@@ -156,7 +185,32 @@ function spawnExplosion( block ) {
     color: block.color,
     frame: 0,
     startTime: performance.now(),
+    duration: EXPLOSION_DURATIONS[ block.color ],
   } );
+}
+
+function spawnParticles( block ) {
+  const sprite = SPRITES.blocks[ block.color ];
+  const count = 4 + Math.floor( Math.random() * 3 ); // 4-6
+
+  for ( let i = 0; i < count; i++ ) {
+    const angle = -Math.PI / 2 + ( Math.random() - 0.5 ) * Math.PI; // hacia arriba/lateral
+    const speed = 2 + Math.random() * 3;
+
+    particles.push( {
+      x: block.x + Math.random() * ( block.w - PARTICLE_SIZE ),
+      y: block.y + Math.random() * ( block.h - PARTICLE_SIZE ),
+      vx: Math.cos( angle ) * speed,
+      vy: Math.sin( angle ) * speed,
+      color: block.color,
+      sx: sprite.sx + Math.floor( Math.random() * ( sprite.sw - PARTICLE_SIZE ) ),
+      sy: sprite.sy + Math.floor( Math.random() * ( sprite.sh - PARTICLE_SIZE ) ),
+      sw: PARTICLE_SIZE,
+      sh: PARTICLE_SIZE,
+      startTime: performance.now(),
+      life: PARTICLE_LIFE,
+    } );
+  }
 }
 
 function checkBlockCollisions() {
@@ -166,6 +220,8 @@ function checkBlockCollisions() {
     block.alive = false;
     score += POINTS_PER_BLOCK;
     spawnExplosion( block );
+    spawnParticles( block );
+    triggerScreenShake();
 
     const overlapX = Math.min( ball.x + ball.w - block.x, block.x + block.w - ball.x );
     const overlapY = Math.min( ball.y + ball.h - block.y, block.y + block.h - ball.y );
@@ -182,12 +238,49 @@ function checkBlockCollisions() {
 
 function updateExplosions() {
   const now = performance.now();
-  const frameDuration = EXPLOSION_DURATION / 4;
 
   explosions = explosions.filter( ( explosion ) => {
+    const frameDuration = explosion.duration / 4;
     const elapsed = now - explosion.startTime;
     explosion.frame = Math.floor( elapsed / frameDuration );
     return explosion.frame < 4;
+  } );
+}
+
+function triggerScreenShake() {
+  screenShake = { startTime: performance.now(), duration: 200, magnitude: 8 };
+}
+
+function getScreenShakeOffset() {
+  if ( screenShake.startTime === null ) return { x: 0, y: 0 };
+
+  const elapsed = performance.now() - screenShake.startTime;
+  if ( elapsed >= screenShake.duration ) {
+    screenShake = { startTime: null, duration: 0, magnitude: 0 };
+    return { x: 0, y: 0 };
+  }
+
+  const decay = 1 - elapsed / screenShake.duration;
+  const magnitude = screenShake.magnitude * decay;
+
+  return {
+    x: ( Math.random() * 2 - 1 ) * magnitude,
+    y: ( Math.random() * 2 - 1 ) * magnitude,
+  };
+}
+
+function updateParticles() {
+  const now = performance.now();
+
+  particles = particles.filter( ( particle ) => {
+    const elapsed = now - particle.startTime;
+    if ( elapsed >= particle.life ) return false;
+
+    particle.vy += PARTICLE_GRAVITY;
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+
+    return true;
   } );
 }
 
@@ -223,6 +316,7 @@ function update() {
   if ( gameState !== 'playing' ) return;
 
   updateExplosions();
+  updateParticles();
 
   updateBallPhysics();
 

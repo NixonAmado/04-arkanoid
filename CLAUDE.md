@@ -32,7 +32,7 @@ No hay paso de build ni servidor requerido. Para probar cambios: `open index.htm
 loadSpritesheet(cb)                        // carga la imagen; llama cb al terminar
 drawSprite(ctx, name, x, y, w, h)          // dibuja un sprite por nombre
 drawFrame(ctx, frame, x, y, w, h)          // dibuja un frame de animación
-// Constantes exportadas: SPRITES, EXPLOSION_FRAMES, EXPLOSION_DURATION
+// Constantes exportadas: SPRITES, EXPLOSION_FRAMES, EXPLOSION_DURATIONS
 ```
 
 ### Sprites disponibles
@@ -43,7 +43,7 @@ drawFrame(ctx, frame, x, y, w, h)          // dibuja un frame de animación
 | `ball` | Pelota (16×16 px) |
 | `block_gray`, `block_red`, `block_yellow`, `block_cyan`, `block_magenta`, `block_hotpink`, `block_green` | Bloques por color |
 
-Las explosiones usan `EXPLOSION_FRAMES[color]` (4 frames) y duran `EXPLOSION_DURATION` ms.
+Las explosiones usan `EXPLOSION_FRAMES[color]` (4 frames) y duran `EXPLOSION_DURATIONS[color]` ms (varía por color).
 
 ### Estado del juego (en `game.js`)
 
