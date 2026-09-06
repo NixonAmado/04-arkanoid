@@ -1,6 +1,6 @@
 # SPEC 03 — Sonidos de colision
 
-> **Estado:** Draft
+> **Estado:** Aprobado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-06
 > **Objetivo:** Reproducir un efecto de sonido al chocar la pelota con paredes, bloques y la barra, usando los audios ya existentes en `assets/sounds/`.

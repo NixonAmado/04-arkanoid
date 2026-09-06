@@ -26,6 +26,18 @@ let particles = [];
 let screenShake = { startTime: null, duration: 0, magnitude: 0 };
 const keys = {};
 
+const sounds = {
+  wall: new Audio( 'assets/sounds/ball-bounce.mp3' ),
+  paddle: new Audio( 'assets/sounds/ball-bounce.mp3' ),
+  block: new Audio( 'assets/sounds/break-sound.mp3' ),
+};
+
+function playSound( name ) {
+  const audio = sounds[ name ];
+  audio.currentTime = 0;
+  audio.play();
+}
+
 function clamp( value, min, max ) {
   return Math.min( Math.max( value, min ), max );
 }
@@ -157,18 +169,22 @@ function updateBallPhysics() {
   if ( ball.x <= 0 ) {
     ball.x = 0;
     ball.vx = -ball.vx;
+    playSound( 'wall' );
   } else if ( ball.x + ball.w >= canvas.width ) {
     ball.x = canvas.width - ball.w;
     ball.vx = -ball.vx;
+    playSound( 'wall' );
   }
 
   if ( ball.y <= 0 ) {
     ball.y = 0;
     ball.vy = -ball.vy;
+    playSound( 'wall' );
   }
 
   if ( ball.vy > 0 && rectsIntersect( ball, paddle ) ) {
     bounceOffPaddle();
+    playSound( 'paddle' );
   }
 
   checkBlockCollisions();
@@ -222,6 +238,7 @@ function checkBlockCollisions() {
     spawnExplosion( block );
     spawnParticles( block );
     triggerScreenShake();
+    playSound( 'block' );
 
     const overlapX = Math.min( ball.x + ball.w - block.x, block.x + block.w - ball.x );
     const overlapY = Math.min( ball.y + ball.h - block.y, block.y + block.h - ball.y );
