@@ -24,7 +24,19 @@ No hay paso de build ni servidor requerido. Para probar cambios: `open index.htm
 ### Assets
 
 - **`assets/spritesheet-breakout.png`** — spritesheet único con todos los sprites
-- **`assets/sounds/ball-bounce.mp3`** y **`assets/sounds/break-sound.mp3`** — efectos de sonido
+- **`assets/sounds/ball-bounce.mp3`** — rebote contra paredes y paddle
+- **`assets/sounds/break-sound.mp3`** — destrucción de bloque
+
+### Audio (en `game.js`)
+
+```js
+const sounds = {
+  wall: new Audio('assets/sounds/ball-bounce.mp3'),
+  paddle: new Audio('assets/sounds/ball-bounce.mp3'), // instancia separada, mismo archivo
+  block: new Audio('assets/sounds/break-sound.mp3'),
+};
+playSound(name) // reinicia currentTime = 0 y llama play(); falla silenciosamente si el navegador bloquea autoplay
+```
 
 ### API de `spritesheet.js`
 
@@ -66,33 +78,45 @@ Este proyecto usa desarrollo guiado por specs. **No escribir código sin spec ap
 
 | Comando | Acción |
 |---|---|
-| `/spec [descripción]` | Diseña una spec nueva haciendo preguntas primero. Guarda en `specs/NN-slug.md` con estado `Draft`. |
+| `/spec [descripción]` | Diseña una spec nueva haciendo preguntas primero. Guarda en `.claude/specs/NN-slug.md` con estado `Draft`. |
 | `/spec-impl NN-slug` | Implementa la spec aprobada paso a paso, creando rama `spec-NN-slug` y pausando tras cada paso. |
 
 ### Ciclo de vida de una spec
 
 ```
-Draft → Approved → Implementado
+Draft → Aprobado → Implementado
                ↘ Obsoleto
 ```
 
 El estado se cambia **manualmente** antes de ejecutar `/spec-impl`. Nunca implementar una spec en estado `Draft`.
 
-### Estructura de una spec (`specs/NN-slug.md`)
+### Estructura de una spec (`.claude/specs/NN-slug.md`)
 
 ```markdown
-# NN — Título breve
+# SPEC NN — Título breve
 
-- **Estado:** Draft | Approved | Implementado | Obsoleto
-- **Fecha:** YYYY-MM-DD
-- **Dependencias:** specs previas requeridas
-- **Objetivo:** una sola frase
+> **Estado:** Draft | Aprobado | Implementado | Obsoleto
+> **Depende de:** specs previas requeridas (o "Ninguna")
+> **Fecha:** YYYY-MM-DD
+> **Objetivo:** una sola frase
 
-## Alcance
-## Modelo de datos
-## Plan de implementación   ← pasos numerados, cada uno commiteable
-## Criterios de aceptación  ← checklist booleano
-## Decisiones               ← qué se consideró y por qué
+## Scope
+### In / Out of scope
+
+## Data model
+## Implementation plan   ← pasos numerados, cada uno con su prueba manual
+## Acceptance criteria   ← checklist booleano
+## Decisiones            ← qué se consideró y por qué
 ## Qué NO incluye este spec
 ```
+
+### Specs existentes
+
+| Spec | Estado | Resumen |
+|---|---|---|
+| `01-mvp-arkanoid.md` | Implementado | Juego base: paddle, pelota, bloques, niveles, HUD |
+| `02-explosion-mejorada.md` | Implementado | Animación de explosión por color al destruir bloques |
+| `03-sonidos-colision.md` | Aprobado/Implementado | Efectos de sonido en colisiones (pared, paddle, bloque) |
+
+Cada rama de feature sigue el nombre `spec-NN-slug` y se mergea vía PR contra `spec-01-mvp-arkanoid` (rama principal del repo).
 
