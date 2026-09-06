@@ -9,6 +9,9 @@ const PADDLE_SPEED = 8;
 const MAX_BOUNCE_ANGLE = Math.PI / 3; // 60°
 const POINTS_PER_BLOCK = 10;
 const STARTING_LIVES = 3;
+const PARTICLE_GRAVITY = 0.25;
+const PARTICLE_SIZE = 8;
+const PARTICLE_LIFE = 500;
 
 let gameState = 'start';
 let score = 0;
@@ -19,6 +22,7 @@ let paddle = { x: 0, y: 0, w: PADDLE_W, h: PADDLE_H };
 let ball = { x: 0, y: 0, w: BALL_SIZE, h: BALL_SIZE, vx: 0, vy: 0 };
 let blocks = [];
 let explosions = [];
+let particles = [];
 const keys = {};
 
 function clamp( value, min, max ) {
@@ -29,6 +33,7 @@ function resetLevel( levelIndex ) {
   const level = LEVELS[ levelIndex ];
   blocks = level.blocks.map( b => ( { ...b } ) );
   explosions = [];
+  particles = [];
 
   paddle.x = ( canvas.width - PADDLE_W ) / 2;
   paddle.y = canvas.height - PADDLE_H - 20;
@@ -160,6 +165,30 @@ function spawnExplosion( block ) {
   } );
 }
 
+function spawnParticles( block ) {
+  const sprite = SPRITES.blocks[ block.color ];
+  const count = 4 + Math.floor( Math.random() * 3 ); // 4-6
+
+  for ( let i = 0; i < count; i++ ) {
+    const angle = -Math.PI / 2 + ( Math.random() - 0.5 ) * Math.PI; // hacia arriba/lateral
+    const speed = 2 + Math.random() * 3;
+
+    particles.push( {
+      x: block.x + Math.random() * ( block.w - PARTICLE_SIZE ),
+      y: block.y + Math.random() * ( block.h - PARTICLE_SIZE ),
+      vx: Math.cos( angle ) * speed,
+      vy: Math.sin( angle ) * speed,
+      color: block.color,
+      sx: sprite.sx + Math.floor( Math.random() * ( sprite.sw - PARTICLE_SIZE ) ),
+      sy: sprite.sy + Math.floor( Math.random() * ( sprite.sh - PARTICLE_SIZE ) ),
+      sw: PARTICLE_SIZE,
+      sh: PARTICLE_SIZE,
+      startTime: performance.now(),
+      life: PARTICLE_LIFE,
+    } );
+  }
+}
+
 function checkBlockCollisions() {
   for ( const block of blocks ) {
     if ( !block.alive || !rectsIntersect( ball, block ) ) continue;
@@ -167,6 +196,7 @@ function checkBlockCollisions() {
     block.alive = false;
     score += POINTS_PER_BLOCK;
     spawnExplosion( block );
+    spawnParticles( block );
 
     const overlapX = Math.min( ball.x + ball.w - block.x, block.x + block.w - ball.x );
     const overlapY = Math.min( ball.y + ball.h - block.y, block.y + block.h - ball.y );
