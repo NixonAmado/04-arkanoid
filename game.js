@@ -156,6 +156,7 @@ function spawnExplosion( block ) {
     color: block.color,
     frame: 0,
     startTime: performance.now(),
+    duration: EXPLOSION_DURATIONS[ block.color ],
   } );
 }
 
@@ -182,9 +183,9 @@ function checkBlockCollisions() {
 
 function updateExplosions() {
   const now = performance.now();
-  const frameDuration = EXPLOSION_DURATION / 4;
 
   explosions = explosions.filter( ( explosion ) => {
+    const frameDuration = explosion.duration / 4;
     const elapsed = now - explosion.startTime;
     explosion.frame = Math.floor( elapsed / frameDuration );
     return explosion.frame < 4;
