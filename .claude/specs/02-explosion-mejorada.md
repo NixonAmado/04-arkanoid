@@ -1,6 +1,6 @@
 # SPEC 02 — Mejora de animación de explosión de bloques
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-06
 > **Objetivo:** Enriquecer la destrucción de bloques (ya implementada en SPEC 01) con partículas de fragmento, screen shake y duración de explosión configurable por color.
@@ -68,13 +68,13 @@ Convenciones:
 
 ## Acceptance criteria
 
-- [ ] Cada color de bloque tiene su propia duración de explosión definida en `EXPLOSION_DURATIONS`, y la animación respeta esa duración por bloque destruido.
-- [ ] Al destruir un bloque se generan entre 4 y 6 partículas recortadas del sprite de su color, en posiciones/ángulos variados.
-- [ ] Las partículas caen por gravedad simulada y se desvanecen (fade) hasta desaparecer, sin quedar acumuladas indefinidamente en el arreglo `particles`.
-- [ ] Al destruir un bloque el canvas tiembla de forma notoria (~6-10px) durante ~200ms y luego vuelve a su posición normal.
-- [ ] Romper varios bloques en sucesión rápida no pausa la física de la pelota ni bloquea el input del jugador.
-- [ ] Las coordenadas reales de `paddle`, `ball` y `blocks` nunca se ven alteradas por el shake (solo el render).
-- [ ] El resto del comportamiento de SPEC 01 (puntaje, vidas, progresión de nivel, HUD) sigue funcionando sin regresiones.
+- [x] Cada color de bloque tiene su propia duración de explosión definida en `EXPLOSION_DURATIONS`, y la animación respeta esa duración por bloque destruido.
+- [x] Al destruir un bloque se generan entre 4 y 6 partículas recortadas del sprite de su color, en posiciones/ángulos variados.
+- [x] Las partículas caen por gravedad simulada y se desvanecen (fade) hasta desaparecer, sin quedar acumuladas indefinidamente en el arreglo `particles`.
+- [x] Al destruir un bloque el canvas tiembla de forma notoria (~6-10px) durante ~200ms y luego vuelve a su posición normal.
+- [x] Romper varios bloques en sucesión rápida no pausa la física de la pelota ni bloquea el input del jugador.
+- [x] Las coordenadas reales de `paddle`, `ball` y `blocks` nunca se ven alteradas por el shake (solo el render).
+- [x] El resto del comportamiento de SPEC 01 (puntaje, vidas, progresión de nivel, HUD) sigue funcionando sin regresiones.
 
 ## Decisions
 
